@@ -1,0 +1,7 @@
+name: files
+description: A web application
+dependencies:
+  browser: any
+  quiver: any
+dev_dependencies:
+  unittest: any
