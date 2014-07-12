@@ -23,35 +23,32 @@ class HtmlFileSystem implements FileSystem {
 class HtmlFile implements File {
   final HtmlFileSystem _fs;
   final String _path;
-  html.FileEntry __file;
 
   HtmlFile._(this._fs, this._path);
 
   String get path => _path;
 
-  Future<html.FileEntry> _getFileEntry() {
-    if (__file != null) return new Future.value(__file);
-    return _fs._fileSystem.root.getFile(_path).then((f) {
-      __file = f as html.FileEntry;
-      return f;
-    });
-  }
+  Future<html.Entry> _getFile() => _fs._fileSystem.root.getFile(_path);
 
-  Future<DateTime> lastModified() => _getFileEntry()
+  Future<html.Entry> _createFile() => _fs._fileSystem.root.createFile(_path);
+
+  Future<DateTime> lastModified() => _getFile()
       .then((e) => e.file as html.File)
       .then((f) => f.lastModifiedDate);
 
   Future<bool> exists() => _fs._fileSystem.root.getFile(_path)
       .then((_) => true)
       .catchError((e) {
-        print(e);
-        return false;
+        if (e is html.FileError && e.code == html.FileError.NOT_FOUND_ERR) {
+          return false;
+        }
+        throw e;
       });
 
-  Future<int> length() => _getFileEntry().then((f) => f.size);
+  Future<int> length() => _getFile().then((f) => f.size);
 
   Stream<List<int>> read([int start, int end]) {
-    return new FutureStream<List<int>>(_getFileEntry()
+    return new FutureStream<List<int>>(_getFile()
         .then((html.FileEntry entry) => entry.file as html.File)
         .then((html.File file) {
           if (start != null || end != null) {
@@ -69,24 +66,35 @@ class HtmlFile implements File {
   }
 
   Future<String> readAsString() {
-    return _getFileEntry().then((file) {
-      html.FileReader reader = new html.FileReader();
-      var future = reader.onLoadEnd.first.then((_) {
-        print(reader.result.runtimeType);
-        return reader.result;
+    return _getFile()
+      .then((html.FileEntry e) => e.file())
+      .then((html.File file) {
+        html.FileReader reader = new html.FileReader();
+        var future = reader.onLoadEnd.first.then((_) {
+          print(reader.result.runtimeType);
+          return reader.result;
+        });
+        reader.readAsText(file);
+        return future;
       });
-      reader.readAsText(file);
-      return future;
-    });
   }
 
   IOSink openWrite({FileMode mode: FileMode.WRITE, Encoding encoding: UTF8}) {
-    var consumer = new _FileStreamConsumer(_getFileEntry());
+    var consumer = new _FileStreamConsumer(_getFile());
     return new IOSink(consumer);
   }
 
+  Future<File> writeAsString(String contents, {Encoding encoding: UTF8}) {
+    return _createFile()
+      .then((e) => e.createWriter())
+      .then((html.FileWriter writer) {
+        return writer.write(new html.Blob([contents], 'text/plain'));
+      })
+      .then((_) => this);
+  }
+
   Future<File> rename(String newPath) {
-    return _getFileEntry().then((e) {
+    return _getFile().then((e) {
       return e.getParent().then((p) {
         // this is probably wrong for full paths
         return e.moveTo(p, name: newPath).then((newEntry) {
@@ -147,5 +155,18 @@ class _FileStreamConsumer extends StreamConsumer<List<int>> {
     var f = _writerFuture.then((w) => w.abort());
     _writerFuture = null;
     return f;
+  }
+}
+
+class HtmlDirectory implements Directory {
+
+  @override
+  Future<Directory> create({bool recursive: false}) {
+    // TODO: implement create
+  }
+
+  @override
+  Future<Directory> rename(String newPath) {
+    // TODO: implement rename
   }
 }
