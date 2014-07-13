@@ -5,6 +5,7 @@ import 'dart:convert';
 import 'dart:io' as io;
 
 import 'files.dart';
+export 'files.dart';
 
 class IoFileSystem implements FileSystem {
 
@@ -32,10 +33,14 @@ class IoFile implements File {
   Future<String> readAsString() => _file.readAsString();
 
   FileSink openWrite({FileMode mode: FileMode.WRITE, Encoding encoding: UTF8}) =>
-      _file.openWrite(mode: mode, encoding: encoding);
+      new IoFileSink._(_file.openWrite(mode: _ioFileMode(mode), encoding: encoding));
 
   Future<File> rename(String newPath) =>
       _file.rename(newPath).then((f) => new IoFile(f));
+
+  @override
+  Future<File> writeAsString(String contents, {Encoding encoding: UTF8}) =>
+      _file.writeAsString(contents, encoding: encoding).then((f) => this);
 }
 
 class IoDirectory implements Directory {
@@ -48,4 +53,61 @@ class IoDirectory implements Directory {
 
   Future<IoDirectory> rename(String newPath) =>
       _directory.rename(newPath).then((d) => new IoDirectory(d));
+}
+
+io.FileMode _ioFileMode(FileMode mode) {
+  switch (mode) {
+    case FileMode.APPEND:
+      return io.FileMode.APPEND;
+    case FileMode.READ:
+      return io.FileMode.READ;
+    case FileMode.WRITE:
+      return io.FileMode.WRITE;
+    default:
+      throw new ArgumentError("Unknown FileMode: $mode");
+  }
+}
+
+class IoFileSink implements FileSink {
+  final io.IOSink _sink;
+
+  IoFileSink._(this._sink);
+
+  @override
+  void add(List<int> data) => _sink.add(data);
+
+  @override
+  void addError(error, [StackTrace stackTrace]) =>
+      _sink.addError(error, stackTrace);
+
+  @override
+  Future addStream(Stream<List<int>> stream) => _sink.addStream(stream);
+
+  @override
+  Future close() => _sink.close();
+
+  @override
+  Future get done => _sink.done;
+
+  @override
+  void set encoding(Encoding _encoding) { _sink.encoding = _encoding; }
+
+  @override
+  Encoding get encoding => _sink.encoding;
+
+  @override
+  Future flush() => _sink.flush();
+
+  @override
+  void write(Object obj) => _sink.write(obj);
+
+  @override
+  void writeAll(Iterable objects, [String separator = ""]) =>
+      _sink.writeAll(objects, separator);
+
+  @override
+  void writeCharCode(int charCode) => _sink.writeCharCode(charCode);
+
+  @override
+  void writeln([Object obj = ""]) => _sink.writeln(obj);
 }
