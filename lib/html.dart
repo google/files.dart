@@ -9,6 +9,7 @@ import 'package:path/path.dart' as pathlib;
 import 'package:quiver/async.dart';
 
 import 'files.dart';
+export 'files.dart';
 
 class HtmlFileSystem implements FileSystem {
   final html.FileSystem _fileSystem;
@@ -47,7 +48,7 @@ class HtmlFile implements File {
 
   Future<int> length() => _getFile().then((f) => f.size);
 
-  Stream<List<int>> read([int start, int end]) {
+  Stream<List<int>> openRead([int start, int end]) {
     return new FutureStream<List<int>>(_getFile()
         .then((html.FileEntry entry) => entry.file as html.File)
         .then((html.File file) {
@@ -57,7 +58,6 @@ class HtmlFile implements File {
           html.FileReader reader = new html.FileReader();
           // this reads in one chunk, can onLoad be used to read in chunks?
           var stream = reader.onLoadEnd.first.then((_) {
-            print(reader.result.runtimeType);
             return reader.result;
           }).asStream();
           reader.readAsArrayBuffer(file);
@@ -71,7 +71,6 @@ class HtmlFile implements File {
       .then((html.File file) {
         html.FileReader reader = new html.FileReader();
         var future = reader.onLoadEnd.first.then((_) {
-          print(reader.result.runtimeType);
           return reader.result;
         });
         reader.readAsText(file);
@@ -79,9 +78,9 @@ class HtmlFile implements File {
       });
   }
 
-  IOSink openWrite({FileMode mode: FileMode.WRITE, Encoding encoding: UTF8}) {
-    var consumer = new _FileStreamConsumer(_getFile());
-    return new IOSink(consumer);
+  FileSink openWrite({FileMode mode: FileMode.WRITE, Encoding encoding: UTF8}) {
+    var consumer = new _FileStreamConsumer(_createFile());
+    return new FileSink(consumer);
   }
 
   Future<File> writeAsString(String contents, {Encoding encoding: UTF8}) {
@@ -105,9 +104,10 @@ class HtmlFile implements File {
   }
 }
 
+// copied from dart:io _file_impl.dart
 class _FileStreamConsumer extends StreamConsumer<List<int>> {
   File _file;
-  Future<html.FileEntry> _entryFuture;
+  Future<html.Entry> _entryFuture;
   Future<html.FileWriter> _writerFuture;
 
   _FileStreamConsumer(this._entryFuture);
@@ -132,8 +132,14 @@ class _FileStreamConsumer extends StreamConsumer<List<int>> {
             _subscription.pause();
             try {
               var typedData = new Uint8List.fromList(d);
-              var blob = new html.Blob(typedData);
+              var blob = new html.Blob([typedData]);
               writer.write(blob);
+              // TODO: is this the right event to listen to? Does write-end
+              // fire once per write, or once all the writes are done?
+              writer.onWriteEnd.listen((_) {
+                  _subscription.resume();
+                },
+                onError: error);
             } catch (e, stackTrace) {
               error(e, stackTrace);
             }

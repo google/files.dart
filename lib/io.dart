@@ -27,11 +27,11 @@ class IoFile implements File {
 
   Future<int> length() => _file.length();
 
-  Stream<List<int>> read([int start, int end]) => _file.openRead(start, end);
+  Stream<List<int>> openRead([int start, int end]) => _file.openRead(start, end);
 
   Future<String> readAsString() => _file.readAsString();
 
-  IOSink openWrite({FileMode mode: FileMode.WRITE, Encoding encoding: UTF8}) =>
+  FileSink openWrite({FileMode mode: FileMode.WRITE, Encoding encoding: UTF8}) =>
       _file.openWrite(mode: mode, encoding: encoding);
 
   Future<File> rename(String newPath) =>

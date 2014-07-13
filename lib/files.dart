@@ -27,11 +27,14 @@ abstract class File extends FileSystemEntry {
 
   Future<int> length();
 
-  Stream<List<int>> read([int start, int end]);
+  Stream<List<int>> openRead([int start, int end]);
 
   Future<String> readAsString();
 
-  IOSink openWrite({FileMode mode: FileMode.WRITE,
+//  Future<List<int>> readAsBytes() => openRead().toList()
+//      .then((l) => l.expand((i) => i));
+
+  FileSink openWrite({FileMode mode: FileMode.WRITE,
                     Encoding encoding: UTF8});
 
 
@@ -71,27 +74,26 @@ class FileMode {
 /**
  * Helper class to wrap a [StreamConsumer<List<int>>] and provide
  * utility functions for writing to the StreamConsumer directly. The
- * [IOSink] buffers the input given by all [StringSink] methods and will delay
+ * [FileSink] buffers the input given by all [StringSink] methods and will delay
  * an [addStream] until the buffer is flushed.
  *
- * When the [IOSink] is bound to a stream (through [addStream]) any call
- * to the [IOSink] will throw a [StateError]. When the [addStream] completes,
- * the [IOSink] will again be open for all calls.
+ * When the [FileSink] is bound to a stream (through [addStream]) any call
+ * to the [FileSink] will throw a [StateError]. When the [addStream] completes,
+ * the [FileSink] will again be open for all calls.
  *
- * If data is added to the [IOSink] after the sink is closed, the data will be
- * ignored. Use the [done] future to be notified when the [IOSink] is closed.
+ * If data is added to the [FileSink] after the sink is closed, the data will be
+ * ignored. Use the [done] future to be notified when the [FileSink] is closed.
  */
-abstract class IOSink implements StreamSink<List<int>>, StringSink {
-  // TODO(ajohnsen): Make _encodingMutable an argument.
-  factory IOSink(StreamConsumer<List<int>> target,
+abstract class FileSink implements StreamSink<List<int>>, StringSink {
+  factory FileSink(StreamConsumer<List<int>> target,
                  {Encoding encoding: UTF8})
-      => new _IOSinkImpl(target, encoding);
+      => new _FileSinkImpl(target, encoding);
 
   /**
    * The [Encoding] used when writing strings. Depending on the
    * underlying consumer this property might be mutable.
    */
-  Encoding encoding;
+  Encoding get encoding;
 
   /**
    * Adds [data] to the target consumer, ignoring [encoding].
@@ -188,21 +190,11 @@ abstract class IOSink implements StreamSink<List<int>>, StringSink {
   Future get done;
 }
 
-class _IOSinkImpl extends _StreamSinkImpl<List<int>> implements IOSink {
-  Encoding _encoding;
-  bool _encodingMutable = true;
+class _FileSinkImpl extends _StreamSinkImpl<List<int>> implements FileSink {
+  final Encoding encoding;
 
-  _IOSinkImpl(StreamConsumer<List<int>> target, this._encoding)
+  _FileSinkImpl(StreamConsumer<List<int>> target, this.encoding)
       : super(target);
-
-  Encoding get encoding => _encoding;
-
-  void set encoding(Encoding value) {
-    if (!_encodingMutable) {
-      throw new StateError("IOSink encoding is not mutable");
-    }
-    _encoding = value;
-  }
 
   void write(Object obj) {
     // This comment is copied from runtime/lib/string_buffer_patch.dart.
@@ -218,7 +210,7 @@ class _IOSinkImpl extends _StreamSinkImpl<List<int>> implements IOSink {
       }
     }
     if (string.isEmpty) return;
-    add(_encoding.encode(string));
+    add(encoding.encode(string));
   }
 
   void writeAll(Iterable objects, [String separator = ""]) {

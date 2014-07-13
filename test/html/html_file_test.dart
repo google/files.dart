@@ -12,44 +12,103 @@ import 'package:files/html.dart';
 
 main() {
   useHtmlEnhancedConfiguration();
-  var random = new Random();
 
   group('File', () {
 
+    test('path', () {
+      return _getFs().then((fs) {
+        var name = randomName();
+        var file = fs.getFile(name);
+        expect(file.path, name);
+      });
+    });
+
     test('exists', () {
-      return window.requestFileSystem(1000).then((_fs) {
-        var fs = new HtmlFileSystem(_fs);
-        var file = fs.getFile('test1.txt');
+      return _getFs().then((fs) {
+        var file = fs.getFile(randomName());
         return file.exists().then((exists) {
           expect(exists, isFalse);
         });
       });
     });
 
-    test('write and read', () {
-      return window.requestFileSystem(1000).then((_fs) {
-        var fs = new HtmlFileSystem(_fs);
-        var name = random.nextInt(1 << 32).toRadixString(32);
-        print(name);
+    test('write and read as string', () {
+      return _getFs().then((fs) {
+        var name = randomName();
         var file = fs.getFile(name);
         return file.exists()
-          .then((exists) {
-            expect(exists, isFalse);
-          })
+          .then((e) => expect(e, isFalse))
           .then((_) => file.writeAsString('hello'))
           .then((_) => file.readAsString())
           .then((s) {
             expect(s, 'hello');
           });
-      }).catchError((e) {
-        if (e is FileError) {
-          fail('FileError: ${e.code} ${e.message}');
-        } else {
-          throw e;
-        }
       });
     });
 
+    test('openWrite', () {
+      return _getFs().then((fs) {
+        var name = randomName();
+        var file = fs.getFile(name);
+        return file.exists()
+          .then((e) => expect(e, isFalse))
+          .then((_) {
+            FileSink sink = file.openWrite();
+            sink.write('hello');
+            return sink.close();
+          })
+          .then((_) => file.readAsString())
+          .then((s) {
+            expect(s, 'hello');
+          });
+      });
+    });
 
-  });
+    test('rename', () {
+      return _getFs().then((fs) {
+        var name1 = randomName();
+        var name2 = randomName();
+
+        var file = fs.getFile(name1);
+        var file2 = fs.getFile(name2);
+
+        return file.exists()
+          .then((exists) {
+            expect(exists, isFalse);
+          })
+          .then((_) => file2.exists())
+          .then((exists) {
+            expect(exists, isFalse);
+          })
+          .then((_) => file.writeAsString('hello'))
+          .then((_) => file.exists())
+          .then((exists) {
+            expect(exists, isTrue);
+          })
+          .then((_) => file.rename(name2))
+          .then((_) => file.exists())
+          .then((exists) {
+            expect(exists, isFalse);
+          })
+          .then((_) => file2.exists())
+          .then((exists) {
+            expect(exists, isTrue);
+          })
+          .then((_) => file2.readAsString())
+          .then((s) {
+            expect(s, 'hello');
+          });
+        });
+      });
+
+    });
 }
+
+Future<HtmlFileSystem> _getFs() => window.requestFileSystem(1000)
+    .then((fs) => new HtmlFileSystem(fs));
+
+var random = new Random();
+
+String randomName() => _32BitString() + _32BitString() + '.txt';
+
+String _32BitString() => random.nextInt(1 << 32).toRadixString(32);
