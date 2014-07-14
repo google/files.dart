@@ -9,6 +9,6 @@ import 'file_tests.dart';
 
 main() {
   useHtmlEnhancedConfiguration();
-  runFileTests('IoFileSystem', () => window.requestFileSystem(1000)
+  runFileTests('HtmlFileSystem', () => window.requestFileSystem(1000)
       .then((fs) => new HtmlFileSystem(fs)));
 }

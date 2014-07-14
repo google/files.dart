@@ -1,16 +1,16 @@
 library files.file_tests;
 
 import 'dart:async';
+import 'dart:math';
 
 import 'package:files/files.dart';
 import 'package:unittest/unittest.dart';
-import 'dart:math';
 
-var random = new Random();
+final Random _random = new Random();
 
-String randomName() => _32BitString() + _32BitString() + '.txt';
+String _randomName() => _20BitString() + _20BitString() + '.txt';
 
-String _32BitString() => random.nextInt(1 << 32).toRadixString(32);
+String _20BitString() => _random.nextInt(1 << 20).toRadixString(16);
 
 runFileTests(String name, Future<FileSystem> getFs()) {
   group(name, () {
@@ -18,7 +18,7 @@ runFileTests(String name, Future<FileSystem> getFs()) {
 
       test('path', () {
         return getFs().then((fs) {
-          var name = randomName();
+          var name = _randomName();
           var file = fs.getFile(name);
           expect(file.path, name);
         });
@@ -26,7 +26,7 @@ runFileTests(String name, Future<FileSystem> getFs()) {
 
       test('exists', () {
         return getFs().then((fs) {
-          var file = fs.getFile(randomName());
+          var file = fs.getFile(_randomName());
           return file.exists().then((exists) {
             expect(exists, isFalse);
           });
@@ -35,7 +35,7 @@ runFileTests(String name, Future<FileSystem> getFs()) {
 
       test('write and read as string', () {
         return getFs().then((fs) {
-          var name = randomName();
+          var name = _randomName();
           var file = fs.getFile(name);
           return file.exists()
             .then((e) => expect(e, isFalse))
@@ -49,7 +49,7 @@ runFileTests(String name, Future<FileSystem> getFs()) {
 
       test('openWrite() then write()', () {
         return getFs().then((fs) {
-          var name = randomName();
+          var name = _randomName();
           var file = fs.getFile(name);
           return file.exists()
             .then((e) => expect(e, isFalse))
@@ -68,7 +68,7 @@ runFileTests(String name, Future<FileSystem> getFs()) {
 
       test('openWrite() then add()', () {
         return getFs().then((fs) {
-          var name = randomName();
+          var name = _randomName();
           var file = fs.getFile(name);
           return file.exists()
             .then((e) => expect(e, isFalse))
@@ -86,7 +86,7 @@ runFileTests(String name, Future<FileSystem> getFs()) {
 
       test('openWrite() then addStream()', () {
         return getFs().then((fs) {
-          var name = randomName();
+          var name = _randomName();
           var file = fs.getFile(name);
           return file.exists()
             .then((e) => expect(e, isFalse))
@@ -104,8 +104,8 @@ runFileTests(String name, Future<FileSystem> getFs()) {
 
       test('rename', () {
         return getFs().then((fs) {
-          var name1 = randomName();
-          var name2 = randomName();
+          var name1 = _randomName();
+          var name2 = _randomName();
 
           var file = fs.getFile(name1);
           var file2 = fs.getFile(name2);

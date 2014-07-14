@@ -15,12 +15,18 @@ class IoFileSystem implements FileSystem {
       new IoDirectory(new io.Directory(path));
 }
 
-class IoFile implements File {
-  final io.File _file;
+abstract class IoFileSystemEntry implements FileSystemEntry {
+  final io.FileSystemEntity _entity;
 
-  IoFile(this._file);
+  IoFileSystemEntry(this._entity);
 
-  String get path => _file.path;
+  String get path => _entity.path;
+}
+
+class IoFile extends IoFileSystemEntry implements File {
+  IoFile(io.File file) : super(file);
+
+  io.File get _file => _entity;
 
   Future<DateTime> lastModified() => _file.lastModified();
 
@@ -43,10 +49,10 @@ class IoFile implements File {
       _file.writeAsString(contents, encoding: encoding).then((f) => this);
 }
 
-class IoDirectory implements Directory {
-  final io.Directory _directory;
+class IoDirectory extends IoFileSystemEntry implements Directory {
+  IoDirectory(io.Directory directory) : super(directory);
 
-  IoDirectory(this._directory);
+  io.Directory get _directory => _entity;
 
   Future<IoDirectory> create({bool recursive: false}) =>
       _directory.create(recursive: recursive).then((_) => this);
