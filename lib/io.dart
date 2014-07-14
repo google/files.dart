@@ -4,7 +4,10 @@ import 'dart:async';
 import 'dart:convert';
 import 'dart:io' as io;
 
+import 'package:quiver/io.dart';
+
 import 'files.dart';
+import 'package:quiver/async.dart';
 export 'files.dart';
 
 class IoFileSystem implements FileSystem {
@@ -41,12 +44,14 @@ class IoFile extends IoFileSystemEntry implements File {
   FileSink openWrite({FileMode mode: FileMode.WRITE, Encoding encoding: UTF8}) =>
       new IoFileSink._(_file.openWrite(mode: _ioFileMode(mode), encoding: encoding));
 
-  Future<File> rename(String newPath) =>
+  Future<IoFile> writeAsString(String contents, {Encoding encoding: UTF8}) =>
+      _file.writeAsString(contents, encoding: encoding).then((f) => this);
+
+  Future<IoFile> rename(String newPath) =>
       _file.rename(newPath).then((f) => new IoFile(f));
 
-  @override
-  Future<File> writeAsString(String contents, {Encoding encoding: UTF8}) =>
-      _file.writeAsString(contents, encoding: encoding).then((f) => this);
+  Future<IoFile> delete({bool recursive: false}) =>
+      _file.delete(recursive: recursive).then((f) => new IoFile(f));
 }
 
 class IoDirectory extends IoFileSystemEntry implements Directory {
@@ -59,6 +64,21 @@ class IoDirectory extends IoFileSystemEntry implements Directory {
 
   Future<IoDirectory> rename(String newPath) =>
       _directory.rename(newPath).then((d) => new IoDirectory(d));
+
+  Future<IoDirectory> delete({bool recursive}) =>
+      _directory.delete(recursive: recursive).then((d) => new IoDirectory(d));
+
+  Stream<FileSystemEntry> list({bool recursive: false,
+      bool followLinks: true}) =>
+      _directory.list(recursive: recursive, followLinks: followLinks)
+          .map(_wrap);
+}
+
+FileSystemEntry _wrap(io.FileSystemEntity e) {
+  if (e is io.File) return new IoFile(e);
+  if (e is io.Directory) return new IoDirectory(e);
+  if (e is io.Link) throw new UnsupportedError('Links not supported');
+  throw new ArgumentError(e);
 }
 
 io.FileMode _ioFileMode(FileMode mode) {
