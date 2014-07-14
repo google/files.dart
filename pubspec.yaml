@@ -1,0 +1,10 @@
+name: files
+description: A web application
+dependencies:
+  browser: any
+  quiver:
+    git:
+      url: https://github.com/google/quiver-dart.git
+      ref: future_stream
+dev_dependencies:
+  unittest: any
