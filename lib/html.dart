@@ -89,7 +89,7 @@ class HtmlFile extends HtmlFileSystemEntry implements File {
     return new FileSink(consumer);
   }
 
-  Future<File> writeAsString(String contents, {Encoding encoding: UTF8}) {
+  Future<HtmlFile> writeAsString(String contents, {Encoding encoding: UTF8}) {
     return _createFile()
       .then((e) => e.createWriter())
       .then((html.FileWriter writer) {
@@ -98,7 +98,7 @@ class HtmlFile extends HtmlFileSystemEntry implements File {
       .then((_) => this);
   }
 
-  Future<File> rename(String newPath) {
+  Future<HtmlFile> rename(String newPath) {
     return _getFile().then((e) {
       return e.getParent().then((p) {
         // this is probably wrong for full paths
@@ -108,6 +108,11 @@ class HtmlFile extends HtmlFileSystemEntry implements File {
       });
     });
   }
+
+  Future<HtmlFile> delete({bool recursive: false}) =>
+      _getFile()
+          .then((e) => e.remove())
+          .then((_) => this);
 }
 
 // copied from dart:io _file_impl.dart
@@ -181,5 +186,15 @@ class HtmlDirectory extends HtmlFileSystemEntry implements Directory {
   @override
   Future<Directory> rename(String newPath) {
     // TODO: implement rename
+  }
+
+  @override
+  Future<Directory> delete({bool recursive}) {
+    // TODO: implement delete
+  }
+
+  @override
+  Stream<FileSystemEntry> list({bool recursive: false, bool followLinks: true}) {
+    // TODO: implement list
   }
 }

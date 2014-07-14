@@ -17,6 +17,8 @@ abstract class FileSystemEntry {
 
   Future<FileSystemEntry> rename(String newPath);
 
+  Future<FileSystemEntry> delete({bool recursive: false});
+
 }
 
 abstract class File extends FileSystemEntry {
@@ -37,10 +39,11 @@ abstract class File extends FileSystemEntry {
   FileSink openWrite({FileMode mode: FileMode.WRITE,
                     Encoding encoding: UTF8});
 
-
   Future<File> writeAsString(String contents, {Encoding encoding: UTF8});
 
   Future<File> rename(String newPath);
+
+  Future<File> delete({bool recursive: false});
 
 }
 
@@ -49,8 +52,11 @@ abstract class Directory extends FileSystemEntry {
 
   Future<Directory> create({bool recursive: false});
 
+  Future<Directory> delete({bool recursive});
+
   Future<Directory> rename(String newPath);
 
+  Stream<FileSystemEntry> list({bool recursive: false, bool followLinks: true});
 }
 
 /**
