@@ -12,6 +12,14 @@ String _randomName() => _20BitString() + _20BitString() + '.txt';
 
 String _20BitString() => _random.nextInt(1 << 20).toRadixString(16);
 
+Future<File> _createSampleFile(FileSystem fs, [String content]) {
+  var file = fs.getFile(_randomName());
+
+  if (content == null) new Future.value(file);
+
+  return file.writeAsString(content).then((_) => file);
+}
+
 runFileTests(String name, Future<FileSystem> getFs()) {
   group(name, () {
     group('File', () {
@@ -31,6 +39,24 @@ runFileTests(String name, Future<FileSystem> getFs()) {
             expect(exists, isFalse);
           });
         });
+      });
+
+      test('length', () {
+        return getFs()
+          .then((fs) => _createSampleFile(fs, 'hello'))
+          .then((file) => file.length())
+          .then((len) {
+            expect(len, 5);
+          });
+      });
+
+      test('lastModified', () {
+        return getFs()
+          .then((fs) => _createSampleFile(fs, 'hello'))
+          .then((file) => file.lastModified())
+          .then((dateTime) {
+            expect(dateTime, isNotNull);
+          });
       });
 
       test('write and read as string', () {

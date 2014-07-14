@@ -40,7 +40,7 @@ class HtmlFile extends HtmlFileSystemEntry implements File {
   Future<html.Entry> _createFile() => _fs._fileSystem.root.createFile(_path);
 
   Future<DateTime> lastModified() => _getFile()
-      .then((e) => e.file as html.File)
+      .then((e) => e.file())
       .then((f) => f.lastModifiedDate);
 
   Future<bool> exists() => _fs._fileSystem.root.getFile(_path)
@@ -52,7 +52,9 @@ class HtmlFile extends HtmlFileSystemEntry implements File {
         throw e;
       });
 
-  Future<int> length() => _getFile().then((f) => f.size);
+  Future<int> length() => _getFile()
+      .then((e) => e.file())
+      .then((f) => f.size);
 
   Stream<List<int>> openRead([int start, int end]) {
     return new FutureStream<List<int>>(_getFile()
