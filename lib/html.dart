@@ -21,11 +21,17 @@ class HtmlFileSystem implements FileSystem {
   Directory getDirectory(String path) => new HtmlDirectory._(this, path);
 }
 
-class HtmlFile implements File {
+abstract class HtmlFileSystemEntry implements FileSystemEntry {
   final HtmlFileSystem _fs;
   final String _path;
 
-  HtmlFile._(this._fs, this._path);
+  HtmlFileSystemEntry(this._fs, this._path);
+
+  String get path => _path;
+}
+
+class HtmlFile extends HtmlFileSystemEntry implements File {
+  HtmlFile._(HtmlFileSystem fs, String path) : super(fs, path);
 
   String get path => _path;
 
@@ -164,7 +170,8 @@ class _FileStreamConsumer extends StreamConsumer<List<int>> {
   }
 }
 
-class HtmlDirectory implements Directory {
+class HtmlDirectory extends HtmlFileSystemEntry implements Directory {
+  HtmlDirectory._(HtmlFileSystem fs, String path) : super(fs, path);
 
   @override
   Future<Directory> create({bool recursive: false}) {

@@ -13,13 +13,13 @@ abstract class FileSystem {
 
 abstract class FileSystemEntry {
 
+  String get path;
+
   Future<FileSystemEntry> rename(String newPath);
 
 }
 
 abstract class File extends FileSystemEntry {
-
-  String get path;
 
   Future<DateTime> lastModified();
 
