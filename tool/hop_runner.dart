@@ -27,11 +27,21 @@ Task createAnalyzerTask(List<String> files, [List<String> extra_args]) {
   if (extra_args != null) {
     args.addAll(extra_args);
   }
-  return createProcessTask("dartanalyzer", args: args, description: "Statically Analyze Code");
+  return createProcessTask(
+      "dartanalyzer",
+      args: args,
+      description: "Statically Analyze Code");
 }
 
 /* Custom DocGen Task for Flexibility */
-Task createDocGenTask(String path, {compile: false, Iterable<String> excludes: null, include_sdk: true, include_deps: false, out_dir: "docs", verbose: false}) {
+Task createDocGenTask(String path, {
+    bool compile: false,
+    Iterable<String> excludes,
+    bool include_sdk: true,
+    bool include_deps: false,
+    String out_dir: "docs",
+    bool verbose: false
+  }) {
   return new Task((TaskContext context) {
     var args = [];
 
@@ -87,3 +97,4 @@ Future<int> inheritIO(Process process) {
 
   return process.exitCode;
 }
+
