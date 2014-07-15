@@ -2,6 +2,9 @@
 // for details. All rights reserved. Use of this source code is governed by a
 // BSD-style license that can be found in the LICENSE file.
 
+/**
+ * A [FileSystem] implementation for the `dart:html` (Html5) file system.
+ */
 library files.html;
 
 import 'dart:async';
@@ -9,7 +12,6 @@ import 'dart:convert';
 import 'dart:html' as html;
 import 'dart:typed_data';
 
-import 'package:path/path.dart' as pathlib;
 import 'package:quiver/async.dart';
 
 import 'files.dart';
@@ -29,13 +31,13 @@ abstract class HtmlFileSystemEntry implements FileSystemEntry {
   final HtmlFileSystem _fs;
   final String _path;
 
-  HtmlFileSystemEntry(this._fs, this._path);
+  HtmlFileSystemEntry._(this._fs, this._path);
 
   String get path => _path;
 }
 
 class HtmlFile extends HtmlFileSystemEntry implements File {
-  HtmlFile._(HtmlFileSystem fs, String path) : super(fs, path);
+  HtmlFile._(HtmlFileSystem fs, String path) : super._(fs, path);
 
   String get path => _path;
 
@@ -182,7 +184,7 @@ class _FileStreamConsumer extends StreamConsumer<List<int>> {
 }
 
 class HtmlDirectory extends HtmlFileSystemEntry implements Directory {
-  HtmlDirectory._(HtmlFileSystem fs, String path) : super(fs, path);
+  HtmlDirectory._(HtmlFileSystem fs, String path) : super._(fs, path);
 
   @override
   Future<Directory> create({bool recursive: false}) {

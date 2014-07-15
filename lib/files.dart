@@ -2,6 +2,14 @@
 // for details. All rights reserved. Use of this source code is governed by a
 // BSD-style license that can be found in the LICENSE file.
 
+/**
+ * This package defines filesystem APIs that can be implemented for different
+ * environments such as dart:io, Chrome Apps, or network filesystems.
+ *
+ * The API includes `FileSystem`, `File` and `Directory` classes with interfaces
+ * similar to those in dart:io, excluding synchronous operations and
+ * constructors.
+ */
 library files;
 
 import 'dart:async';

@@ -2,36 +2,39 @@
 // for details. All rights reserved. Use of this source code is governed by a
 // BSD-style license that can be found in the LICENSE file.
 
+/**
+ * A [FileSystem] implementation for the `dart:io` library.
+ */
 library files.io;
 
 import 'dart:async';
 import 'dart:convert';
 import 'dart:io' as io;
 
+import 'package:quiver/async.dart';
 import 'package:quiver/io.dart';
 
 import 'files.dart';
-import 'package:quiver/async.dart';
 export 'files.dart';
 
 class IoFileSystem implements FileSystem {
 
-  IoFile getFile(String path) => new IoFile(new io.File(path));
+  IoFile getFile(String path) => new IoFile._(new io.File(path));
 
   IoDirectory getDirectory(String path) =>
-      new IoDirectory(new io.Directory(path));
+      new IoDirectory._(new io.Directory(path));
 }
 
 abstract class IoFileSystemEntry implements FileSystemEntry {
   final io.FileSystemEntity _entity;
 
-  IoFileSystemEntry(this._entity);
+  IoFileSystemEntry._(this._entity);
 
   String get path => _entity.path;
 }
 
 class IoFile extends IoFileSystemEntry implements File {
-  IoFile(io.File file) : super(file);
+  IoFile._(io.File file) : super._(file);
 
   io.File get _file => _entity;
 
@@ -52,14 +55,14 @@ class IoFile extends IoFileSystemEntry implements File {
       _file.writeAsString(contents, encoding: encoding).then((f) => this);
 
   Future<IoFile> rename(String newPath) =>
-      _file.rename(newPath).then((f) => new IoFile(f));
+      _file.rename(newPath).then((f) => new IoFile._(f));
 
   Future<IoFile> delete({bool recursive: false}) =>
-      _file.delete(recursive: recursive).then((f) => new IoFile(f));
+      _file.delete(recursive: recursive).then((f) => new IoFile._(f));
 }
 
 class IoDirectory extends IoFileSystemEntry implements Directory {
-  IoDirectory(io.Directory directory) : super(directory);
+  IoDirectory._(io.Directory directory) : super._(directory);
 
   io.Directory get _directory => _entity;
 
@@ -67,10 +70,10 @@ class IoDirectory extends IoFileSystemEntry implements Directory {
       _directory.create(recursive: recursive).then((_) => this);
 
   Future<IoDirectory> rename(String newPath) =>
-      _directory.rename(newPath).then((d) => new IoDirectory(d));
+      _directory.rename(newPath).then((d) => new IoDirectory._(d));
 
   Future<IoDirectory> delete({bool recursive}) =>
-      _directory.delete(recursive: recursive).then((d) => new IoDirectory(d));
+      _directory.delete(recursive: recursive).then((d) => new IoDirectory._(d));
 
   Stream<FileSystemEntry> list({bool recursive: false,
       bool followLinks: true}) =>
@@ -79,8 +82,8 @@ class IoDirectory extends IoFileSystemEntry implements Directory {
 }
 
 FileSystemEntry _wrap(io.FileSystemEntity e) {
-  if (e is io.File) return new IoFile(e);
-  if (e is io.Directory) return new IoDirectory(e);
+  if (e is io.File) return new IoFile._(e);
+  if (e is io.Directory) return new IoDirectory._(e);
   if (e is io.Link) throw new UnsupportedError('Links not supported');
   throw new ArgumentError(e);
 }
