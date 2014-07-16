@@ -14,6 +14,8 @@ implementations.
 
 ## Status
 
+[![Build Status](https://drone.io/github.com/dart-lang/files.dart/status.png)](https://drone.io/github.com/dart-lang/files.dart/latest)
+
 This is a work in progress and not ready for production use. Implementation and
 tests and being fleshed out now.
 
