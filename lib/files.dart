@@ -59,7 +59,6 @@ abstract class File extends FileSystemEntry {
 
 }
 
-
 abstract class Directory extends FileSystemEntry {
 
   Future<Directory> create({bool recursive: false});
@@ -108,10 +107,12 @@ abstract class FileSink implements StreamSink<List<int>>, StringSink {
       => new _FileSinkImpl(target, encoding);
 
   /**
-   * The [Encoding] used when writing strings. Depending on the
-   * underlying consumer this property might be mutable.
+   * The [Encoding] used when writing strings. Depending on the underlying
+   * consumer this property might be mutable.
    */
   Encoding get encoding;
+
+  void set encoding(Encoding _encoding);
 
   /**
    * Adds [data] to the target consumer, ignoring [encoding].
@@ -213,6 +214,8 @@ class _FileSinkImpl extends _StreamSinkImpl<List<int>> implements FileSink {
 
   _FileSinkImpl(StreamConsumer<List<int>> target, this.encoding)
       : super(target);
+
+  void set encoding(Encoding _encoding) { }
 
   void write(Object obj) {
     // This comment is copied from runtime/lib/string_buffer_patch.dart.

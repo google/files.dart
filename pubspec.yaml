@@ -1,10 +1,10 @@
 name: files
 version: 0.0.1-dev.1
 author: Dart Authors <misc@dartlang.org>
-homepage: https://github.com/dart-lang/files.dart
+homepage: https://github.com/google/files.dart
 description: A filesystem API with implementations for multiple environments
 dependencies:
-  quiver: '>=0.19.0-dev.3 <1.0.0'
+  quiver: '>=0.19.0-dev.3 <=0.21.0'
 dev_dependencies:
   browser: any
   unittest: '>=0.9.2 <=0.12.0'
