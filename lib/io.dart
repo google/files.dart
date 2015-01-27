@@ -69,7 +69,7 @@ class IoDirectory extends IoFileSystemEntry implements Directory {
   Future<IoDirectory> rename(String newPath) =>
       _directory.rename(newPath).then((d) => new IoDirectory._(d));
 
-  Future<IoDirectory> delete({bool recursive}) =>
+  Future<IoDirectory> delete({bool recursive: false}) =>
       _directory.delete(recursive: recursive).then((d) => new IoDirectory._(d));
 
   Stream<FileSystemEntry> list({bool recursive: false,

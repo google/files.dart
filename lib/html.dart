@@ -199,7 +199,7 @@ class HtmlDirectory extends HtmlFileSystemEntry implements Directory {
   }
 
   @override
-  Future<Directory> delete({bool recursive}) {
+  Future<Directory> delete({bool recursive: false}) {
     // TODO: implement delete
     return new Future.error(new UnimplementedError());
   }
