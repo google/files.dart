@@ -63,10 +63,6 @@ abstract class Directory extends FileSystemEntry {
 
   Future<Directory> create({bool recursive: false});
 
-  Future<Directory> delete({bool recursive});
-
-  Future<Directory> rename(String newPath);
-
   Stream<FileSystemEntry> list({bool recursive: false, bool followLinks: true});
 }
 
@@ -83,6 +79,7 @@ class FileMode {
   /// The mode for opening a file for reading and writing to the
   /// end of it. The file is created if it does not already exist.
   static const APPEND = const FileMode._internal(2);
+
   final int _mode;
 
   const FileMode._internal(this._mode);
