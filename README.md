@@ -1,5 +1,6 @@
-files
-=====
+# files
+
+[![Build Status](https://drone.io/github.com/dart-lang/files.dart/status.png)](https://drone.io/github.com/dart-lang/files.dart/latest)
 
 This package defines filesystem APIs that can be implemented for different
 environments such as dart:io, Chrome Apps, or network filesystems.
@@ -13,8 +14,6 @@ that code that uses the interfaces defined here can work with any
 implementations.
 
 ## Status
-
-[![Build Status](https://drone.io/github.com/dart-lang/files.dart/status.png)](https://drone.io/github.com/dart-lang/files.dart/latest)
 
 This is a work in progress and not ready for production use. Implementation and
 tests and being fleshed out now.

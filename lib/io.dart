@@ -11,9 +11,6 @@ import 'dart:async';
 import 'dart:convert';
 import 'dart:io' as io;
 
-import 'package:quiver/async.dart';
-import 'package:quiver/io.dart';
-
 import 'files.dart';
 export 'files.dart';
 

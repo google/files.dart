@@ -189,20 +189,24 @@ class HtmlDirectory extends HtmlFileSystemEntry implements Directory {
   @override
   Future<Directory> create({bool recursive: false}) {
     // TODO: implement create
+    return new Future.error(new UnimplementedError());
   }
 
   @override
   Future<Directory> rename(String newPath) {
     // TODO: implement rename
+    return new Future.error(new UnimplementedError());
   }
 
   @override
   Future<Directory> delete({bool recursive}) {
     // TODO: implement delete
+    return new Future.error(new UnimplementedError());
   }
 
   @override
   Stream<FileSystemEntry> list({bool recursive: false, bool followLinks: true}) {
     // TODO: implement list
+    return new Stream.fromFuture(new Future.error(new UnimplementedError()));
   }
 }
