@@ -1,11 +1,11 @@
-# DEPRECATED
+# files.dart
+
+## DEPRECATED
 
 This package is deprecated. For a more full-featured replacement, see
-[package:file](https://github.com/google/file.dart).
+[package:file](https://github.com/google/file.dart) or similar.
 
 ## files
-
-[![Build Status](https://drone.io/github.com/dart-lang/files.dart/status.png)](https://drone.io/github.com/dart-lang/files.dart/latest)
 
 This package defines filesystem APIs that can be implemented for different
 environments such as dart:io, Chrome Apps, or network filesystems.
@@ -15,5 +15,4 @@ similar to those in dart:io, excluding synchronous operations and constructors.
 
 All `File` and `Directory` implementations should not have public constructors,
 and instances should only be retreived via a `FileSystem` instance. This ensures
-that code that uses the interfaces defined here can work with any
-implementations.
+that code that uses the interfaces defined here can work with any implementations.
