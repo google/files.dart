@@ -1,11 +1,11 @@
 # files.dart
 
-## DEPRECATED
+## Status
 
 This package is deprecated. For a more full-featured replacement, see
 [package:file](https://github.com/google/file.dart) or similar.
 
-## files
+## Overview
 
 This package defines filesystem APIs that can be implemented for different
 environments such as dart:io, Chrome Apps, or network filesystems.
