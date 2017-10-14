@@ -1,4 +1,9 @@
-# files
+# DEPRECATED
+
+This package is deprecated. For a more full-featured replacement, see
+[package:file](https://github.com/google/file.dart).
+
+## files
 
 [![Build Status](https://drone.io/github.com/dart-lang/files.dart/status.png)](https://drone.io/github.com/dart-lang/files.dart/latest)
 
@@ -12,19 +17,3 @@ All `File` and `Directory` implementations should not have public constructors,
 and instances should only be retreived via a `FileSystem` instance. This ensures
 that code that uses the interfaces defined here can work with any
 implementations.
-
-## Status
-
-This is a work in progress and not ready for production use. Implementation and
-tests and being fleshed out now.
-
-## Contributions Welcome
-
-We'd like to have implementations for various situations and file storage APIs,
-including in-memory, proxy filesystems that work across Isolates, clound storage
-services like Google Cloud Storage and Amazon S3, standard protocols like
-WebDAV, wrappers that provide a transformed view of another file system, etc.
-
-Not all implementations have to live in this package, but a few core ones
-should. The more implementations we have early, the better tested the APIs will
-be.
