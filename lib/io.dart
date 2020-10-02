@@ -15,7 +15,6 @@ import 'files.dart';
 export 'files.dart';
 
 class IoFileSystem implements FileSystem {
-
   IoFile getFile(String path) => new IoFile._(new io.File(path));
 
   IoDirectory getDirectory(String path) =>
@@ -41,12 +40,15 @@ class IoFile extends IoFileSystemEntry implements File {
 
   Future<int> length() => _file.length();
 
-  Stream<List<int>> openRead([int start, int end]) => _file.openRead(start, end);
+  Stream<List<int>> openRead([int start, int end]) =>
+      _file.openRead(start, end);
 
   Future<String> readAsString() => _file.readAsString();
 
-  FileSink openWrite({FileMode mode: FileMode.WRITE, Encoding encoding: UTF8}) =>
-      new IoFileSink._(_file.openWrite(mode: _ioFileMode(mode), encoding: encoding));
+  FileSink openWrite(
+          {FileMode mode: FileMode.WRITE, Encoding encoding: UTF8}) =>
+      new IoFileSink._(
+          _file.openWrite(mode: _ioFileMode(mode), encoding: encoding));
 
   Future<IoFile> writeAsString(String contents, {Encoding encoding: UTF8}) =>
       _file.writeAsString(contents, encoding: encoding).then((f) => this);
@@ -72,9 +74,10 @@ class IoDirectory extends IoFileSystemEntry implements Directory {
   Future<IoDirectory> delete({bool recursive: false}) =>
       _directory.delete(recursive: recursive).then((d) => new IoDirectory._(d));
 
-  Stream<FileSystemEntry> list({bool recursive: false,
-      bool followLinks: true}) =>
-      _directory.list(recursive: recursive, followLinks: followLinks)
+  Stream<FileSystemEntry> list(
+          {bool recursive: false, bool followLinks: true}) =>
+      _directory
+          .list(recursive: recursive, followLinks: followLinks)
           .map(_wrap);
 }
 
@@ -120,7 +123,9 @@ class IoFileSink implements FileSink {
   Future get done => _sink.done;
 
   @override
-  void set encoding(Encoding _encoding) { _sink.encoding = _encoding; }
+  void set encoding(Encoding _encoding) {
+    _sink.encoding = _encoding;
+  }
 
   @override
   Encoding get encoding => _sink.encoding;

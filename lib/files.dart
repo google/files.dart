@@ -16,25 +16,20 @@ import 'dart:async';
 import 'dart:convert';
 
 abstract class FileSystem {
-
   File getFile(String path);
 
   Directory getDirectory(String path);
-
 }
 
 abstract class FileSystemEntry {
-
   String get path;
 
   Future<FileSystemEntry> rename(String newPath);
 
   Future<FileSystemEntry> delete({bool recursive: false});
-
 }
 
 abstract class File extends FileSystemEntry {
-
   Future<DateTime> lastModified();
 
   Future<bool> exists();
@@ -48,19 +43,16 @@ abstract class File extends FileSystemEntry {
 //  Future<List<int>> readAsBytes() => openRead().toList()
 //      .then((l) => l.expand((i) => i));
 
-  FileSink openWrite({FileMode mode: FileMode.WRITE,
-                    Encoding encoding: UTF8});
+  FileSink openWrite({FileMode mode: FileMode.WRITE, Encoding encoding: UTF8});
 
   Future<File> writeAsString(String contents, {Encoding encoding: UTF8});
 
   Future<File> rename(String newPath);
 
   Future<File> delete({bool recursive: false});
-
 }
 
 abstract class Directory extends FileSystemEntry {
-
   Future<Directory> create({bool recursive: false});
 
   Stream<FileSystemEntry> list({bool recursive: false, bool followLinks: true});
@@ -72,10 +64,12 @@ abstract class Directory extends FileSystemEntry {
 class FileMode {
   /// The mode for opening a file only for reading.
   static const READ = const FileMode._internal(0);
+
   /// The mode for opening a file for reading and writing. The file is
   /// overwritten if it already exists. The file is created if it does not
   /// already exist.
   static const WRITE = const FileMode._internal(1);
+
   /// The mode for opening a file for reading and writing to the
   /// end of it. The file is created if it does not already exist.
   static const APPEND = const FileMode._internal(2);
@@ -100,8 +94,8 @@ class FileMode {
  */
 abstract class FileSink implements StreamSink<List<int>>, StringSink {
   factory FileSink(StreamConsumer<List<int>> target,
-                 {Encoding encoding: UTF8})
-      => new _FileSinkImpl(target, encoding);
+          {Encoding encoding: UTF8}) =>
+      new _FileSinkImpl(target, encoding);
 
   /**
    * The [Encoding] used when writing strings. Depending on the underlying
@@ -212,7 +206,7 @@ class _FileSinkImpl extends _StreamSinkImpl<List<int>> implements FileSink {
   _FileSinkImpl(StreamConsumer<List<int>> target, this.encoding)
       : super(target);
 
-  void set encoding(Encoding _encoding) { }
+  void set encoding(Encoding _encoding) {}
 
   void write(Object obj) {
     // This comment is copied from runtime/lib/string_buffer_patch.dart.
@@ -287,11 +281,11 @@ class _StreamSinkImpl<T> implements StreamSink<T> {
     if (_hasError) return done;
     // Wait for any sync operations to complete.
     Future targetAddStream() {
-      return _target.addStream(stream)
-          .whenComplete(() {
-            _isBound = false;
-          });
+      return _target.addStream(stream).whenComplete(() {
+        _isBound = false;
+      });
     }
+
     if (_controllerInstance == null) return targetAddStream();
     var future = _controllerCompleter.future;
     _controllerInstance.close();
@@ -309,8 +303,8 @@ class _StreamSinkImpl<T> implements StreamSink<T> {
     var future = _controllerCompleter.future;
     _controllerInstance.close();
     return future.whenComplete(() {
-          _isBound = false;
-        });
+      _isBound = false;
+    });
   }
 
   Future close() {
@@ -329,9 +323,8 @@ class _StreamSinkImpl<T> implements StreamSink<T> {
   }
 
   void _closeTarget() {
-    _target.close()
-        .then((value) => _completeDone(value: value),
-              onError: (error) => _completeDone(error: error));
+    _target.close().then((value) => _completeDone(value: value),
+        onError: (error) => _completeDone(error: error));
   }
 
   Future get done => _doneFuture;
@@ -357,31 +350,28 @@ class _StreamSinkImpl<T> implements StreamSink<T> {
     if (_controllerInstance == null) {
       _controllerInstance = new StreamController<T>(sync: true);
       _controllerCompleter = new Completer();
-      _target.addStream(_controller.stream)
-          .then(
-              (_) {
-                if (_isBound) {
-                  // A new stream takes over - forward values to that stream.
-                  _controllerCompleter.complete(this);
-                  _controllerCompleter = null;
-                  _controllerInstance = null;
-                } else {
-                  // No new stream, .close was called. Close _target.
-                  _closeTarget();
-                }
-              },
-              onError: (error) {
-                if (_isBound) {
-                  // A new stream takes over - forward errors to that stream.
-                  _controllerCompleter.completeError(error);
-                  _controllerCompleter = null;
-                  _controllerInstance = null;
-                } else {
-                  // No new stream. No need to close target, as it have already
-                  // failed.
-                  _completeDone(error: error);
-                }
-              });
+      _target.addStream(_controller.stream).then((_) {
+        if (_isBound) {
+          // A new stream takes over - forward values to that stream.
+          _controllerCompleter.complete(this);
+          _controllerCompleter = null;
+          _controllerInstance = null;
+        } else {
+          // No new stream, .close was called. Close _target.
+          _closeTarget();
+        }
+      }, onError: (error) {
+        if (_isBound) {
+          // A new stream takes over - forward errors to that stream.
+          _controllerCompleter.completeError(error);
+          _controllerCompleter = null;
+          _controllerInstance = null;
+        } else {
+          // No new stream. No need to close target, as it have already
+          // failed.
+          _completeDone(error: error);
+        }
+      });
     }
     return _controllerInstance;
   }
